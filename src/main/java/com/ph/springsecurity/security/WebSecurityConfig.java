@@ -112,6 +112,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		web.ignoring().antMatchers("/css/**", "/js/**");
 	}
 
+	//记住我功能注入
 //	@Bean
 //	public PersistentTokenRepository persistentTokenRepository(){
 //		JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
