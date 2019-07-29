@@ -1,7 +1,6 @@
 package com.ph.springsecurity.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
@@ -13,9 +12,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
@@ -25,19 +23,19 @@ import javax.sql.DataSource;
 
 
 @Configuration
-@EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+//@EnableWebSecurity
+//@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-	@Autowired
-	private CustomUserDetailsService userDetailsService;
+	//@Autowired
+	//private CustomUserDetailsService userDetailsService;
 
-	@Autowired
-	private DataSource dataSource;
+	//@Autowired
+	//private DataSource dataSource;
 
 	@Autowired
 	private AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails> authenticationDetailsSource;
 
-	@Autowired
+	//@Autowired
 	private CustomAuthenticationProvider customAuthenticationProvider;
 
 	@Autowired
@@ -49,9 +47,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.authenticationProvider(customAuthenticationProvider);
+	//@Override
+	//protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		//auth.authenticationProvider(customAuthenticationProvider);
 		//auth.userDetailsService(userDetailsService).passwordEncoder(new PasswordEncoder() {
 		//	@Override
 		//	public String encode(CharSequence charSequence) {
@@ -63,7 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		//		return s.equals(charSequence.toString());
 		//	}
 		//});
-	}
+	//}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -73,36 +71,36 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.anyRequest().authenticated()
 				.and()
 				// 设置登陆页
-				.formLogin().loginPage("/login")
+				.formLogin().loginPage("/login").permitAll()
 				// 设置登陆成功页
 				.successHandler(customAuthenticationSuccessHandler)
-				.failureHandler(customAuthenticationFailureHandler).permitAll()
+				.failureHandler(customAuthenticationFailureHandler);
 				//.defaultSuccessUrl("/").permitAll()
 				//.failureUrl("/login/error")
 				// 自定义登陆用户名和密码参数，默认为username和password
 				//                .usernameParameter("username")
 				//                .passwordParameter("password")
-				.authenticationDetailsSource(authenticationDetailsSource)
-				.and()
+				//.authenticationDetailsSource(authenticationDetailsSource)
+				//.and()
 				//.addFilterBefore(new VerifyFilter(), UsernamePasswordAuthenticationFilter.class)
-				.logout().permitAll()
-				.and().rememberMe()
-				.tokenRepository(persistentTokenRepository())
-				.tokenValiditySeconds(10)
-				.userDetailsService(userDetailsService)
-				.and()
-				.sessionManagement().invalidSessionUrl("/login/invalid")
-				.maximumSessions(1)
+				//.logout().permitAll()
+				//.and().rememberMe()
+				//.tokenRepository(persistentTokenRepository())
+				//.tokenValiditySeconds(10)
+				////.userDetailsService(userDetailsService)
+				//.and()
+				//.sessionManagement().invalidSessionUrl("/login/invalid")
+				//.maximumSessions(1)
 				// 当达到最大值时，是否保留已经登录的用户
-				.maxSessionsPreventsLogin(false)
+				//.maxSessionsPreventsLogin(false)
 				// 当达到最大值时，旧用户被踢出后的操作
-				.expiredSessionStrategy(new CustomExpiredSessionStrategy())
-				.sessionRegistry(new SessionRegistryImpl());
+				//.expiredSessionStrategy(new CustomExpiredSessionStrategy())
+				//.sessionRegistry(new SessionRegistryImpl());
 
-		http.logout()
-				.logoutUrl("/signout")
-				.deleteCookies("JSESSIONID")
-				.logoutSuccessHandler(customLogoutSuccessHandler);
+		//http.logout()
+		//		.logoutUrl("/signout")
+		//		.deleteCookies("JSESSIONID")
+		//		.logoutSuccessHandler(customLogoutSuccessHandler);
 
 		// 关闭CSRF跨域
 		http.csrf().disable();
@@ -114,14 +112,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		web.ignoring().antMatchers("/css/**", "/js/**");
 	}
 
-	@Bean
-	public PersistentTokenRepository persistentTokenRepository(){
-		JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
-		tokenRepository.setDataSource(dataSource);
-		// 如果token表不存在，使用下面语句可以初始化该表；若存在，请注释掉这条语句，否则会报错。
-//        tokenRepository.setCreateTableOnStartup(true);
-		return tokenRepository;
-	}
+//	@Bean
+//	public PersistentTokenRepository persistentTokenRepository(){
+//		JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+//		//tokenRepository.setDataSource(dataSource);
+//		// 如果token表不存在，使用下面语句可以初始化该表；若存在，请注释掉这条语句，否则会报错。
+////        tokenRepository.setCreateTableOnStartup(true);
+//		return tokenRepository;
+//	}
 
 	/**
 	 * 注入自定义PermissionEvaluator
@@ -136,5 +134,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Bean
 	public SessionRegistry sessionRegistry() {
 		return new SessionRegistryImpl();
+	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
 	}
 }

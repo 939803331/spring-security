@@ -22,14 +22,14 @@ import java.util.List;
 @Controller
 public class LoginController {
 
-	@Autowired
-	private SessionRegistry sessionRegistry;
+	//@Autowired
+	//private SessionRegistry sessionRegistry;
 
 
 	@RequestMapping("/")
-	public String showHome() {
-		String name = SecurityContextHolder.getContext().getAuthentication().getName();
-		log.info("当前登陆用户：" + name);
+	public String showHome(Authentication authentication) {
+		//String name = SecurityContextHolder.getContext().getAuthentication().getName();
+		log.info("当前登陆用户：" + authentication.getName());
 
 		return "home.html";
 	}
@@ -84,23 +84,23 @@ public class LoginController {
 	public String removeUserSessionByUsername(@RequestParam String username) {
 		int count = 0;
 
-		// 获取session中所有的用户信息
-		List<Object> users = sessionRegistry.getAllPrincipals();
-		for (Object principal : users) {
-			if (principal instanceof User) {
-				String principalName = ((User)principal).getUsername();
-				if (principalName.equals(username)) {
-					// 参数二：是否包含过期的Session
-					List<SessionInformation> sessionsInfo = sessionRegistry.getAllSessions(principal, false);
-					if (null != sessionsInfo && sessionsInfo.size() > 0) {
-						for (SessionInformation sessionInformation : sessionsInfo) {
-							sessionInformation.expireNow();
-							count++;
-						}
-					}
-				}
-			}
-		}
+		//// 获取session中所有的用户信息
+		//List<Object> users = sessionRegistry.getAllPrincipals();
+		//for (Object principal : users) {
+		//	if (principal instanceof User) {
+		//		String principalName = ((User)principal).getUsername();
+		//		if (principalName.equals(username)) {
+		//			// 参数二：是否包含过期的Session
+		//			List<SessionInformation> sessionsInfo = sessionRegistry.getAllSessions(principal, false);
+		//			if (null != sessionsInfo && sessionsInfo.size() > 0) {
+		//				for (SessionInformation sessionInformation : sessionsInfo) {
+		//					sessionInformation.expireNow();
+		//					count++;
+		//				}
+		//			}
+		//		}
+		//	}
+		//}
 		return "操作成功，清理session共" + count + "个";
 	}
 
